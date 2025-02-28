@@ -61,4 +61,15 @@ app = Flask(__name__)
 def home():
     return "Monitoramento rodando!", 200
 
-def run_flask()
+def run_flask():
+    port = int(os.environ.get("PORT", 10000))  # Pega a porta do Render
+    print(f"[INFO] Servidor Flask rodando na porta {port}")
+    app.run(host="0.0.0.0", port=port)
+
+# Iniciar monitoramento e Flask em threads separadas
+if __name__ == "__main__":
+    threading.Thread(target=run_flask, daemon=True).start()
+    threading.Thread(target=monitor_loop, daemon=True).start()
+
+    while True:
+        time.sleep(10)  # Mantém o script rodando
