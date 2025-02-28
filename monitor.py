@@ -24,8 +24,16 @@ def is_server_online():
     """Verifica se o servidor do mercadinho está online"""
     try:
         response = requests.get(MERCADO_SERVER_URL, timeout=5)
+        # Considera online apenas se responder com código 200
         return response.status_code == 200
-    except requests.exceptions.RequestException:
+    except requests.exceptions.ConnectionError:
+        print("[ALERTA] Erro de conexão - O servidor está offline!")
+        return False
+    except requests.exceptions.Timeout:
+        print("[ALERTA] Timeout - O servidor pode estar offline!")
+        return False
+    except requests.exceptions.RequestException as e:
+        print(f"[ERRO] Falha ao acessar o servidor: {e}")
         return False
 
 # Loop infinito para monitoramento
