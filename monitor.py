@@ -37,3 +37,19 @@ while True:
             send_telegram("🚨 A internet do mercadinho caiu! Verifique a conexão.")
             internet_off = True
     time.sleep(60)  # Verifica a cada 1 minuto
+from flask import Flask
+import threading
+
+# Criar um Web Server Falso para o Render não interromper o script
+app = Flask(__name__)
+
+@app.route('/')
+def home():
+    return "Monitoramento rodando!", 200
+
+def run_flask():
+    app.run(host="0.0.0.0", port=10000)  # Porta qualquer para evitar erro no Render
+
+# Iniciar Flask em uma thread separada
+flask_thread = threading.Thread(target=run_flask)
+flask_thread.start()
