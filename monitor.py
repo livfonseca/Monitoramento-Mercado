@@ -38,18 +38,21 @@ def is_server_online():
 
 # Loop infinito para monitoramento
 internet_off = False
-def monitor_loop():
-    global internet_off
-    while True:
-        if is_server_online():
-            if internet_off:
-                send_telegram("✅ A internet do mercadinho voltou!")
-                internet_off = False
-        else:
-            if not internet_off:
-                send_telegram("🚨 A internet do mercadinho caiu! Verifique a conexão.")
-                internet_off = True
-        time.sleep(60)  # Verifica a cada 1 minuto
+
+while True:
+    online = is_server_online()
+    print(f"[INFO] Status do servidor: {'Online' if online else 'Offline'}")
+    
+    if online:
+        if internet_off:
+            send_telegram("✅ A internet do mercadinho voltou!")
+            internet_off = False
+    else:
+        if not internet_off:
+            send_telegram("🚨 A internet do mercadinho caiu! Verifique a conexão.")
+            internet_off = True
+    
+    time.sleep(60)  # Verifica a cada 1 minuto
 
 # Criar um Web Server para evitar que o Render pare
 app = Flask(__name__)
