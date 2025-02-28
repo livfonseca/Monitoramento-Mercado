@@ -16,7 +16,7 @@ def send_telegram(message):
     url = f"https://api.telegram.org/bot{TELEGRAM_BOT_TOKEN}/sendMessage"
     data = {"chat_id": TELEGRAM_CHAT_ID, "text": message}
     try:
-        response = requests.post(url, data=data)
+        requests.post(url, data=data)
         print(f"[INFO] Mensagem enviada: {message}")
     except Exception as e:
         print(f"[ERRO] Falha ao enviar mensagem: {e}")
@@ -61,12 +61,4 @@ app = Flask(__name__)
 def home():
     return "Monitoramento rodando!", 200
 
-def run_flask():
-    port = int(os.environ.get("PORT", 10000))  # Pega a porta do Render
-    print(f"[INFO] Servidor Flask rodando na porta {port}")
-    app.run(host="0.0.0.0", port=port)
-
-# Iniciar monitoramento e Flask em threads separadas
-if __name__ == "__main__":
-    threading.Thread(target=run_flask, daemon=True).start()
-    threading.Thread(targe
+def run_flask()
