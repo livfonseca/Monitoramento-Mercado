@@ -1,8 +1,11 @@
+import os
 import time
 import requests
+import threading
+from flask import Flask
 
 # Configuração do servidor a ser monitorado
-MERCADO_SERVER_URL = "http://192.168.1.100:5000/"  # Troque pelo IP correto
+MERCADO_SERVER_URL = "http://192.168.1.100:5000/"  # Substitua pelo IP correto
 
 # Configuração do Telegram
 TELEGRAM_BOT_TOKEN = "SEU_BOT_TOKEN_AQUI"
@@ -25,22 +28,22 @@ def is_server_online():
     except requests.exceptions.RequestException:
         return False
 
-# Loop infinito para monitorar a cada 1 minuto
+# Loop infinito para monitoramento
 internet_off = False
-while True:
-    if is_server_online():
-        if internet_off:
-            send_telegram("✅ A internet do mercadinho voltou!")
-            internet_off = False
-    else:
-        if not internet_off:
-            send_telegram("🚨 A internet do mercadinho caiu! Verifique a conexão.")
-            internet_off = True
-    time.sleep(60)  # Verifica a cada 1 minuto
-from flask import Flask
-import threading
+def monitor_loop():
+    global internet_off
+    while True:
+        if is_server_online():
+            if internet_off:
+                send_telegram("✅ A internet do mercadinho voltou!")
+                internet_off = False
+        else:
+            if not internet_off:
+                send_telegram("🚨 A internet do mercadinho caiu! Verifique a conexão.")
+                internet_off = True
+        time.sleep(60)  # Verifica a cada 1 minuto
 
-# Criar um Web Server Falso para o Render não interromper o script
+# Criar um Web Server para evitar que o Render pare
 app = Flask(__name__)
 
 @app.route('/')
@@ -48,8 +51,12 @@ def home():
     return "Monitoramento rodando!", 200
 
 def run_flask():
-    app.run(host="0.0.0.0", port=10000)  # Porta qualquer para evitar erro no Render
+    port = int(os.environ.get("PORT", 10000))  # Pega a porta do Render
+    app.run(host="0.0.0.0", port=port)
 
-# Iniciar Flask em uma thread separada
+# Iniciar monitoramento e Flask em threads separadas
+monitor_thread = threading.Thread(target=monitor_loop)
+monitor_thread.start()
+
 flask_thread = threading.Thread(target=run_flask)
 flask_thread.start()
