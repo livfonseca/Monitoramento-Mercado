@@ -9,7 +9,7 @@ TELEGRAM_BOT_TOKEN = os.getenv("TELEGRAM_BOT_TOKEN")
 TELEGRAM_CHAT_ID = os.getenv("TELEGRAM_CHAT_ID")
 
 # Configuração do servidor a ser monitorado
-MERCADO_SERVER_URL = "https://78f1-170-245-82-133.ngrok-free.app -> http://localhost:5000"  # Substitua pelo IP correto
+MERCADO_SERVER_URL = "https://0946-170-245-82-133 -> http://localhost:5000"  # Substitua pelo IP correto
 
 def send_telegram(message):
     """Envia uma notificação para o Telegram"""
