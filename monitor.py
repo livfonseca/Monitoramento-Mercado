@@ -44,20 +44,18 @@ def monitor_loop():
     global internet_off
     internet_off = None  # Inicializamos como None para evitar notificações falsas
 
-    # Aguardar 2 minutos antes de começar o monitoramento para evitar erros ao reiniciar o Render
-    print("[INFO] Aguardando 2 minutos para garantir que o servidor do mercadinho está totalmente online...")
-    time.sleep(120)  # Espera 2 minutos antes de começar
-
     while True:
         online = is_server_online()
         print(f"[INFO] Status do servidor: {'Online' if online else 'Offline'}")
 
-        if online and internet_off is not False:  
-            send_telegram("✅ A internet do mercadinho voltou!")
-            internet_off = False
-        elif not online and internet_off is not True:
-            send_telegram("🚨 A internet do mercadinho caiu! Verifique a conexão.")
-            internet_off = True
+        if online:
+            if internet_off is not False:  
+                send_telegram("✅ A internet do mercadinho voltou!")  # Mensagem de retorno!
+                internet_off = False
+        else:
+            if internet_off is not True:
+                send_telegram("🚨 A internet do mercadinho caiu! Verifique a conexão.")
+                internet_off = True
 
         time.sleep(60)  # Verifica a cada 1 minuto
 
