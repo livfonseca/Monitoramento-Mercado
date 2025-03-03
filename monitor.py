@@ -13,13 +13,16 @@ MERCADO_SERVER_URL = "http://192.168.1.100:5000/"  # Substitua pelo IP correto
 
 def send_telegram(message):
     """Envia uma notificação para o Telegram"""
-    url = f"https://api.telegram.org/bot{TELEGRAM_BOT_TOKEN}/sendMessage"
-    data = {"chat_id": TELEGRAM_CHAT_ID, "text": message}
-    try:
-        requests.post(url, data=data)
-        print(f"[INFO] Mensagem enviada: {message}")
-    except Exception as e:
-        print(f"[ERRO] Falha ao enviar mensagem: {e}")
+    if TELEGRAM_BOT_TOKEN and TELEGRAM_CHAT_ID:
+        url = f"https://api.telegram.org/bot{TELEGRAM_BOT_TOKEN}/sendMessage"
+        data = {"chat_id": TELEGRAM_CHAT_ID, "text": message}
+        try:
+            response = requests.post(url, data=data)
+            print(f"[INFO] Mensagem enviada: {message}")
+        except Exception as e:
+            print(f"[ERRO] Falha ao enviar mensagem: {e}")
+    else:
+        print("[ERRO] Token do Telegram ou Chat ID não configurados!")
 
 def is_server_online():
     """Verifica se o servidor do mercadinho está online"""
@@ -36,22 +39,22 @@ def is_server_online():
         print(f"[ERRO] Falha ao acessar o servidor: {e}")
         return False
 
-# Loop infinito para monitoramento
 def monitor_loop():
-    internet_off = False
+    """Loop infinito para monitoramento"""
+    global internet_off
+    internet_off = None  # Inicializamos como None para enviar notificação na primeira verificação
+
     while True:
         online = is_server_online()
         print(f"[INFO] Status do servidor: {'Online' if online else 'Offline'}")
-        
-        if online:
-            if internet_off:
-                send_telegram("✅ A internet do mercadinho voltou!")
-                internet_off = False
-        else:
-            if not internet_off:
-                send_telegram("🚨 A internet do mercadinho caiu! Verifique a conexão.")
-                internet_off = True
-        
+
+        if online and internet_off is not False:  
+            send_telegram("✅ A internet do mercadinho voltou!")
+            internet_off = False
+        elif not online and internet_off is not True:
+            send_telegram("🚨 A internet do mercadinho caiu! Verifique a conexão.")
+            internet_off = True
+
         time.sleep(60)  # Verifica a cada 1 minuto
 
 # Criar um Web Server para evitar que o Render pare
