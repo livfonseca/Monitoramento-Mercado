@@ -76,8 +76,16 @@ def run_flask():
 
 # Iniciar monitoramento e Flask em threads separadas
 if __name__ == "__main__":
-    threading.Thread(target=run_flask, daemon=True).start()
-    threading.Thread(target=monitor_loop, daemon=True).start()
+    print("[INFO] Iniciando o servidor Flask e o monitoramento...")
+
+    flask_thread = threading.Thread(target=run_flask, daemon=True)
+    flask_thread.start()
+
+    monitor_thread = threading.Thread(target=monitor_loop, daemon=True)
+    monitor_thread.start()
+
+    print("[INFO] Monitoramento iniciado com sucesso!")
 
     while True:
-        time.sleep(10)  # Mantém o script rodando
+        time.sleep(10)  # Mantém o script rodando para evitar encerramento
+
