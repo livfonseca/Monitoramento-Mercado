@@ -28,7 +28,12 @@ def is_server_online():
     """Verifica se o servidor do mercadinho está online"""
     try:
         response = requests.get(MERCADO_SERVER_URL, timeout=5)
-        return response.status_code == 200
+        if response.status_code == 200:
+            print("[INFO] O servidor está respondendo corretamente.")
+            return True
+        else:
+            print(f"[ERRO] O servidor respondeu com código {response.status_code}.")
+            return False
     except requests.exceptions.ConnectionError:
         print("[ALERTA] Erro de conexão - O servidor está offline!")
         return False
@@ -48,14 +53,12 @@ def monitor_loop():
         online = is_server_online()
         print(f"[INFO] Status do servidor: {'Online' if online else 'Offline'}")
 
-        if online:
-            if internet_off is not False:  
-                send_telegram("✅ A internet do mercadinho voltou!")  # Mensagem de retorno!
-                internet_off = False
-        else:
-            if internet_off is not True:
-                send_telegram("🚨 A internet do mercadinho caiu! Verifique a conexão.")
-                internet_off = True
+        if online and internet_off is not False:  
+            send_telegram("✅ A internet do mercadinho voltou!")  # Mensagem de retorno!
+            internet_off = False
+        elif not online and internet_off is not True:
+            send_telegram("🚨 A internet do mercadinho caiu! Verifique a conexão.")
+            internet_off = True
 
         time.sleep(60)  # Verifica a cada 1 minuto
 
